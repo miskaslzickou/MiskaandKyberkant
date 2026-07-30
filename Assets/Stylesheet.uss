@@ -1,0 +1,67 @@
+:root {
+
+}
+
+#items-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    padding-right: 40px; /* Shifts the center slightly to the left */
+}
+
+#items-armour {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* Offset of 60px to the left to leave room for a silhouette image beside it */
+    padding-left: 60px;
+}
+
+.inv-slot-item, .inv-slot-armour {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height:64px;
+    max-width: 64px;
+    max-height:64px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+    border-width: 1px;
+    border-radius: 4px;
+
+    /* Centers child visual elements (like an inserted Icon/Image) */
+    align-items: center;
+    justify-content: center;
+
+    /* Ensures background image scaling is properly centered without stretching */
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.inv-slot-item.slot-hover, .inv-slot-armour.slot-hover {
+    background-color: rgba(50, 50, 50, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+.inv-slot-item.slot-dragging,
+.inv-slot-armour.slot-dragging {
+    background-color: rgba(0, 0, 0, 0.5); /* stejné jako default */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.inv-item {
+    /* Set fixed size for the items so they don't collapse into 0x0 dots */
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    
+    /* Ensure the icon image scales without stretching and is centered */
+    -unity-background-scale-mode: scale-to-fit;
+
+    /* Optional rounding to match the slots nicely */
+    border-radius: 4px;
+}
