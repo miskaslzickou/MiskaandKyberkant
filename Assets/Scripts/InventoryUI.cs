@@ -1,23 +1,9 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// ── Item categories ──────────────────────────────────────────────────────────
-public enum ItemCategory { Hat, Chest, Boots, Ring, Weapon, Item }
 
-// ── Slot types ────────────────────────────────────────────────────────────────
-public enum SlotType { Hat, Chest, Boots, Ring, ItemSlot }
-
-// ── Data class for an inventory item ─────────────────────────────────────────
-[System.Serializable]
-public class InventoryItem
-{
-    public string itemName;
-    [TextArea(2, 4)]
-    public string description;
-    public ItemCategory category;
-    public Sprite icon;
-}
 
 // ── Drag manipulator ──────────────────────────────────────────────────────────
 public class ItemDragManipulator : PointerManipulator
@@ -152,8 +138,7 @@ public class InventoryUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private UIDocument uiDocument;
 
-    [Header("Starting items")]
-    [SerializeField] private List<InventoryItem> startingItems = new();
+    
 
     // slotName → item currently in that slot
     private readonly Dictionary<string, InventoryItem> _slotContents = new();
@@ -185,12 +170,13 @@ public class InventoryUI : MonoBehaviour
         _tooltipLabel.style.borderTopRightRadius = 4;
         _tooltipLabel.style.borderBottomLeftRadius = 4;
         _tooltipLabel.style.borderBottomRightRadius = 4;
+        _tooltipLabel.style.fontSize = 20;
         _tooltipLabel.style.display = DisplayStyle.None;
         _tooltipLabel.pickingMode = PickingMode.Ignore; // Aby neblokoval klikání myší
         _root.Add(_tooltipLabel);
 
         RegisterSlotTypes();
-        PopulateStartingItems();
+        
     }
 
     public void ShowTooltip(string text, Vector2 mousePos)
@@ -449,11 +435,7 @@ public class InventoryUI : MonoBehaviour
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.RemoveFromClassList("slot-hover"));
     }
 
-    private void PopulateStartingItems()
-    {
-        foreach (InventoryItem item in startingItems)
-            AddItemToContainer(item);
-    }
+   
 
     private VisualElement CreateItemElement(InventoryItem item)
     {
@@ -465,9 +447,13 @@ public class InventoryUI : MonoBehaviour
             element.style.backgroundImage = new StyleBackground(item.icon);
 
         element.AddManipulator(new ItemDragManipulator(element, _root, item, this));
-
+        string itemStats = "";
+        foreach (StatBonus bonus in item.stats)
+        {
+            itemStats += $"{bonus.value} {bonus.statType}\n";
+        }
         // Vlastní tooltip pomocí UI událostí
-        string text = $"{item.itemName}\n\n{item.description}";
+        string text = $"{item.itemName}\n\n {item.description}\n\n {itemStats} ";
         element.RegisterCallback<PointerEnterEvent>(evt => ShowTooltip(text, evt.position));
         element.RegisterCallback<PointerMoveEvent>(evt => ShowTooltip(text, evt.position));
         element.RegisterCallback<PointerLeaveEvent>(evt => HideTooltip());

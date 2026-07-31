@@ -669,7 +669,6 @@ GameObject:
   - component: {fileID: 1169804096}
   - component: {fileID: 1169804098}
   - component: {fileID: 1169804099}
-  - component: {fileID: 1169804100}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -849,20 +848,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
   uiDocument: {fileID: 1961916003}
---- !u!114 &1169804100
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1169804093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfe4cbdc32881cc4c9e60019f48da557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
-  uiDocument: {fileID: 1961916003}
-  inventoryUI: {fileID: 1169804099}
+  startingItems:
+  - itemName: Dirty ol hat
+    description: This old hat belonged to a rascal who lost it during war
+    category: 0
+    icon: {fileID: -9097067248546533923, guid: de6ba9c9e7ded914f84f0f0a5262458d, type: 3}
+  - itemName: Dirty ol coat
+    description: This old coat belonged to a rascal who lost it during war
+    category: 1
+    icon: {fileID: 8080668813433402155, guid: 437aaa273ecf76d4ca38f7e036923b9f, type: 3}
 --- !u!1 &1961916002
 GameObject:
   m_ObjectHideFlags: 0

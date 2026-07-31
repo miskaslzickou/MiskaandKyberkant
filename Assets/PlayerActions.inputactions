@@ -550,7 +550,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Open inventory",
+                    "name": "Open Inventory",
                     "type": "Button",
                     "id": "7ee8700c-9e84-4177-8a4a-bcb5099ba353",
                     "expectedControlType": "",
@@ -618,11 +618,11 @@
                 {
                     "name": "",
                     "id": "1da371e4-7a1a-44cf-b7c7-8a465f5efd2e",
-                    "path": "",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Open inventory",
+                    "action": "Open Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
