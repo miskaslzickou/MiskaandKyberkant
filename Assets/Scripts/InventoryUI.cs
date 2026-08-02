@@ -100,13 +100,15 @@ public class ItemDragManipulator : PointerManipulator
             if (distSq < bestDistSq) { bestDistSq = distSq; bestSlot = slot; }
         }
 
+        bool success = false;
         if (bestSlot != null)
         {
-            _ui.OnItemDroppedInSlot(_item, bestSlot, _sourceSlot);
+            success = _ui.OnItemDroppedInSlot(_item, bestSlot, _sourceSlot);
         }
-        else
+        
+        if (!success)
         {
-            // Reset translace při nepovedeném puštění
+            // Reset translace při nepovedeném puštění nebo neplatném swapu
             SetTranslate(target, new Vector2(0, 0));
         }
     }
@@ -228,6 +230,13 @@ public class InventoryUI : MonoBehaviour
             return false;
         }
 
+        // Pojistka pro položky přidané přímo v Unity Inspectoru přes startingItems, 
+        // u kterých neproběhl konstruktor a nemají generované instanceId
+        if (string.IsNullOrEmpty(item.instanceId))
+        {
+            item.instanceId = $"{item.itemName}_{System.Guid.NewGuid()}";
+        }
+
         // Spawn the element inside the slot
         VisualElement element = CreateItemElement(item);
         slot.Add(element);
@@ -237,7 +246,7 @@ public class InventoryUI : MonoBehaviour
         SetSlotSilhouetteTint(slot, Color.clear);
 
         _slotContents[slotName] = item;
-        _itemElements[item.itemName] = element;
+        _itemElements[item.instanceId] = element;
 
         OnItemInserted?.Invoke(item, slotName);
         Debug.Log($"[Inventory] Inserted '{item.itemName}' → '{slotName}'");
@@ -263,11 +272,11 @@ public class InventoryUI : MonoBehaviour
             SetSlotSilhouetteTint(slot, new Color(1, 1, 1, 0.5f));
         }
 
-        // Remove visual element
-        if (_itemElements.TryGetValue(item.itemName, out VisualElement element))
+        // Remove visual element pomocí unikátního ID
+        if (_itemElements.TryGetValue(item.instanceId, out VisualElement element))
         {
             element.RemoveFromHierarchy();
-            _itemElements.Remove(item.itemName);
+            _itemElements.Remove(item.instanceId);
         }
 
         _slotContents.Remove(slotName);
@@ -356,39 +365,64 @@ public class InventoryUI : MonoBehaviour
     // =========================================================================
 
     // Called by drag manipulator after a successful drag-and-drop
-    public void OnItemDroppedInSlot(InventoryItem item, VisualElement slot, VisualElement sourceSlot)
+    public bool OnItemDroppedInSlot(InventoryItem item, VisualElement slot, VisualElement sourceSlot)
     {
         string slotName = slot.name;
+        string sourceSlotName = sourceSlot != null ? sourceSlot.name : null;
 
-        // Reset source slotu
+        // Pokud to hodíme do stejného slotu, kde to už bylo, jen resetujeme pozici
+        if (slotName == sourceSlotName) return false;
+
+        bool isOccupied = _slotContents.TryGetValue(slotName, out InventoryItem targetItem);
+
+        // Zkusíme Stackování (pokud stejný předmět a oba jsou typu Item)
+        if (isOccupied && targetItem.itemName == item.itemName && item.category == ItemCategory.Item)
+        {
+            // Přidáme množství ze zdrojového itemu k tomu cílovému
+            targetItem.quantity += item.quantity;
+            
+            // Zničíme starý přesouvaný originál, protože už je v cílovém stacku
+            RemoveItemFromSlot(sourceSlotName);
+            
+            // Aktualizujeme UI label s číslíčkem na cílovém elementu
+            UpdateItemQuantityUI(targetItem);
+
+            Debug.Log($"[Inventory] Stacked '{item.itemName}' together. New quantity: {targetItem.quantity}");
+            return true;
+        }
+
+        // Zkusit SWAP (Prohození pozic, pokud je cílový slot obsazen jiným itemem)
+        if (isOccupied)
+        {
+            // Musíme ověřit, jestli se item, který tam je, smí umístit do zdrojového (source) slotu
+            SlotType sourceType = sourceSlot != null ? (SlotType)sourceSlot.userData : SlotType.ItemSlot;
+            if (!ItemDragManipulator.IsCompatible(targetItem.category, sourceType))
+            {
+                Debug.LogWarning($"[Inventory] Nemohu prohodit, '{targetItem.itemName}' nemůže jít do zdrojového slotu.");
+                return false; // Odmítneme drop a item se vrátí zpět na původní translaci
+            }
+
+            // Můžeme prohodit. Nejdřív je ale oba korektně vyjmeme z vizuálních slotů!
+            RemoveItemFromSlot(slotName);      // vyjme targetItem
+            RemoveItemFromSlot(sourceSlotName);// vyjme draggedItem (item)
+
+            // Vložíme je na jejich nová místa
+            InsertItem(targetItem, sourceSlotName);
+            InsertItem(item, slotName);
+            
+            Debug.Log($"[Inventory] Swapped '{item.itemName}' & '{targetItem.itemName}'");
+            return true;
+        }
+
+        // Pokud je slot volný (žádný swap se nekoná), klasicky ho tam přendáme
         if (sourceSlot != null)
         {
-            sourceSlot.RemoveFromClassList("occupied");
-            SetSlotSilhouetteTint(sourceSlot, new Color(1, 1, 1, 0.5f));
-            _slotContents.Remove(sourceSlot.name);
-            OnItemRemoved?.Invoke(item, sourceSlot.name);
+            RemoveItemFromSlot(sourceSlotName);
         }
 
-        // If slot was already occupied, record the eviction
-        if (_slotContents.TryGetValue(slotName, out InventoryItem previous))
-        {
-            _slotContents.Remove(slotName);
-            OnItemRemoved?.Invoke(previous, slotName);
-        }
-
-        _slotContents[slotName] = item;
-        VisualElement element = _itemElements[item.itemName];
-
-        // Přesuneme element fyzicky jako child slotu a vyresetujeme jeho translaci
-        slot.Add(element);
-        element.style.translate = new StyleTranslate(new Translate(0, 0));
-
-        // Nastavíme occupied stav na novém slotu
-        slot.AddToClassList("occupied");
-        SetSlotSilhouetteTint(slot, Color.clear);
-
-        OnItemInserted?.Invoke(item, slotName);
+        InsertItem(item, slotName);
         Debug.Log($"[Inventory] Drag-dropped '{item.itemName}' → '{slotName}'");
+        return true;
     }
 
     private void SetSlotSilhouetteTint(VisualElement slot, Color color)
@@ -448,18 +482,36 @@ public class InventoryUI : MonoBehaviour
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.RemoveFromClassList("slot-hover"));
     }
 
-   
-
     private VisualElement CreateItemElement(InventoryItem item)
     {
         var element = new VisualElement();
-        element.name = $"item-{item.itemName}";
+        element.name = $"item-{item.instanceId}";
         element.AddToClassList("inv-item");
 
         if (item.icon != null)
             element.style.backgroundImage = new StyleBackground(item.icon);
 
         element.AddManipulator(new ItemDragManipulator(element, _root, item, this));
+
+        // Label pro zobrazení množství (quantity), přidán do pravého dolního rohu itemu
+        Label qtyLabel = new Label();
+        qtyLabel.name = "qty-label";
+        qtyLabel.style.position = Position.Absolute;
+        qtyLabel.style.bottom = 2;
+        qtyLabel.style.right = -3;
+        qtyLabel.style.color = new StyleColor(Color.white);
+        qtyLabel.style.fontSize = 14; // Můžeš si upravit ve stylopisu
+        qtyLabel.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.7f));
+        qtyLabel.style.paddingLeft = 3;
+        qtyLabel.style.paddingRight = 3;
+        qtyLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        // Přidáme jemný stín (Outline) aby bylo číslo dobře vidět i na světlém pozadí ikonek
+        qtyLabel.style.textShadow = new TextShadow { color = Color.black, offset = new Vector2(1, 1), blurRadius = 3 };
+        qtyLabel.text =  item.quantity.ToString() ;
+
+        if(item.category == ItemCategory.Item)
+        element.Add(qtyLabel);
+
         string itemStats = "";
         foreach (StatBonus bonus in item.stats)
         {
@@ -474,6 +526,19 @@ public class InventoryUI : MonoBehaviour
 
         return element;
     }
+
+    public void UpdateItemQuantityUI(InventoryItem item)
+    {
+        if (_itemElements.TryGetValue(item.instanceId, out VisualElement element))
+        {
+            Label qtyLabel = element.Q<Label>("qty-label");
+            if (qtyLabel != null)
+            {
+                // Pokud je víc jak 1 položka, ukážeme číslo, jinak ho schováme, ať nestraší jednička všude po inventáři
+                qtyLabel.text = item.quantity > 1 ? item.quantity.ToString() : "";
+            }
+        }
+    } 
 
     //pozdeji barva na zakladě rarity, ted jsem nechal old kod
     private static Color CategoryColor(ItemCategory cat) => cat switch

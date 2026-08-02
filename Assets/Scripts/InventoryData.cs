@@ -19,15 +19,27 @@ public class InventoryItem
     public string description;
     public ItemCategory category;
     public Sprite icon;
+    
+    // Množství (stackování)
+    public int quantity = 1;
 
     // Proměnná držící statistiky
     public List<StatBonus> stats=new List<StatBonus>();
+
+    // Unikátní ID pro každou instanci (např. kvůli duplicitám ve stejném inventáři)
+    [System.NonSerialized]
+    public string instanceId;
+
     public InventoryItem(ItemData sourceData)
     {
         this.itemName = sourceData.itemName;
         this.description = sourceData.description;
         this.category = sourceData.category;
         this.icon = sourceData.icon;
+        this.quantity = 1; // Defaultní množství při vytvoření z ItemData
+
+        // Generujeme si unikátní ID pro toto konkrétní jablko, aby se nemíchalo s dalším jablkem.
+        this.instanceId = $"{this.itemName}_{System.Guid.NewGuid()}";
 
         // Tady si ten item sám zkopíruje statistiky!
         this.stats = new List<StatBonus>();

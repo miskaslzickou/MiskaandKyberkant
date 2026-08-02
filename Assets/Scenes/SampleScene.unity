@@ -995,7 +995,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Cheats
   inventoryUI: {fileID: 2051625580}
   cheatWeapon: {fileID: 11400000, guid: b678fcd69d2323949a0efbacb4d6172e, type: 2}
-  cheatArmor: {fileID: 0}
+  cheatArmor: {fileID: 11400000, guid: 2ae3608985e86b547b3cf666b7a2ecbb, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
