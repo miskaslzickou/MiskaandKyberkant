@@ -993,8 +993,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6eeecf3f984dbc34abf2f4652ee361e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cheats
-  inventoryUI: {fileID: 0}
-  cheatWeapon: {fileID: 0}
+  inventoryUI: {fileID: 2051625580}
+  cheatWeapon: {fileID: 11400000, guid: b678fcd69d2323949a0efbacb4d6172e, type: 2}
   cheatArmor: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
