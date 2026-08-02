@@ -65,3 +65,8 @@
     /* Optional rounding to match the slots nicely */
     border-radius: 4px;
 }
+.stat-row-text{
+    font-size: 14px;
+    color: white;
+    margin: 2px 0;
+}

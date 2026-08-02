@@ -16,3 +16,6 @@ MonoBehaviour:
   description: 
   category: 2
   icon: {fileID: 21300000, guid: 927ddad869b6b7b4587587edc3e754ec, type: 3}
+  stats:
+  - statType: 2
+    value: 15

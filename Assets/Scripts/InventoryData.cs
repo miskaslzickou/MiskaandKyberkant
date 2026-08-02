@@ -22,5 +22,22 @@ public class InventoryItem
 
     // Proměnná držící statistiky
     public List<StatBonus> stats=new List<StatBonus>();
+    public InventoryItem(ItemData sourceData)
+    {
+        this.itemName = sourceData.itemName;
+        this.description = sourceData.description;
+        this.category = sourceData.category;
+        this.icon = sourceData.icon;
+
+        // Tady si ten item sám zkopíruje statistiky!
+        this.stats = new List<StatBonus>();
+        if (sourceData.stats != null)
+        {
+            foreach (var bonus in sourceData.stats)
+            {
+                this.stats.Add(new StatBonus { statType = bonus.statType, value = bonus.value });
+            }
+        }
+    }
 }
 
