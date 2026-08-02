@@ -1,16 +1,50 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Cheats : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [Header("Odkaz na Inventář")]
+    public InventoryUI inventoryUI;
 
-    // Update is called once per frame
+    [Header("Itemy k naklikání (Scriptable Objects)")]
+    public ItemData cheatWeapon;
+    public ItemData cheatArmor;
+    
+
     void Update()
     {
-        
+        // Pro cheaty je nejlepší použít klasický Input, ať se s tím nemusíš 
+        // složitě bindovat v New Input Systemu. Tyhle klávesy před vydáním hry smažeš.
+
+        // Zmáčkni F1 pro zbraň
+        if (Keyboard.current == null) return;
+
+        // 3. Nový způsob čtení kláves: wasPressedThisFrame
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
+        {
+            GiveCheatItem(cheatWeapon);
+        }
+
+        if (Keyboard.current.f2Key.wasPressedThisFrame)
+        {
+            GiveCheatItem(cheatArmor);
+        }
+    }
+
+    private void GiveCheatItem(ItemData data)
+    {
+        if (data == null || inventoryUI == null)
+        {
+            Debug.LogWarning("[CHEAT] Chybí item nebo inventář v Inspectoru!");
+            return;
+        }
+
+        // 1. Tady využijeme ten náš parádní konstruktor, co jsme napsali minule!
+        InventoryItem newItem = new InventoryItem(data);
+
+        // 2. Hodíme to do inventáře
+        inventoryUI.AddItemToContainer(newItem);
+
+        Debug.Log($"[CHEAT] 🎁 Vývojářský drop: Hráč dostal {data.itemName}!");
     }
 }

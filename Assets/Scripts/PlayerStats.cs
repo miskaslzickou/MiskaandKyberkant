@@ -7,6 +7,7 @@ public class PlayerStats : MonoBehaviour
     [Header("Propojení")]
     public InventoryUI inventoryUI;
 
+    
     // Slovníky pro staty (žádné ruční naklikávání v Inspectoru)
     private Dictionary<StatType, float> baseStats = new Dictionary<StatType, float>();
     public Dictionary<StatType, float> TotalStats { get; private set; } = new Dictionary<StatType, float>();
