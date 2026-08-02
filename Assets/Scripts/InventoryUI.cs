@@ -234,7 +234,7 @@ public class InventoryUI : MonoBehaviour
 
         // Skrytí původní siluety / ikony pozadí
         slot.AddToClassList("occupied");
-        slot.style.unityBackgroundImageTintColor = new StyleColor(Color.clear);
+        SetSlotSilhouetteTint(slot, Color.clear);
 
         _slotContents[slotName] = item;
         _itemElements[item.itemName] = element;
@@ -260,7 +260,7 @@ public class InventoryUI : MonoBehaviour
         if (slot != null)
         {
             slot.RemoveFromClassList("occupied");
-            slot.style.unityBackgroundImageTintColor = new Color(1, 1, 1, 0.5f);
+            SetSlotSilhouetteTint(slot, new Color(1, 1, 1, 0.5f));
         }
 
         // Remove visual element
@@ -364,7 +364,7 @@ public class InventoryUI : MonoBehaviour
         if (sourceSlot != null)
         {
             sourceSlot.RemoveFromClassList("occupied");
-            sourceSlot.style.unityBackgroundImageTintColor = new Color(1,1,1,0.5f);
+            SetSlotSilhouetteTint(sourceSlot, new Color(1, 1, 1, 0.5f));
             _slotContents.Remove(sourceSlot.name);
             OnItemRemoved?.Invoke(item, sourceSlot.name);
         }
@@ -385,10 +385,23 @@ public class InventoryUI : MonoBehaviour
 
         // Nastavíme occupied stav na novém slotu
         slot.AddToClassList("occupied");
-        slot.style.unityBackgroundImageTintColor = new StyleColor(Color.clear);
+        SetSlotSilhouetteTint(slot, Color.clear);
 
         OnItemInserted?.Invoke(item, slotName);
         Debug.Log($"[Inventory] Drag-dropped '{item.itemName}' → '{slotName}'");
+    }
+
+    private void SetSlotSilhouetteTint(VisualElement slot, Color color)
+    {
+        // Projdeme děti slotu a změníme tint barvu pozadí všem, které nejsou samotným itemem
+        foreach (var child in slot.Children())
+        {
+            if (!child.ClassListContains("inv-item"))
+            {
+                child.style.unityBackgroundImageTintColor = new StyleColor(color);
+                break;
+            }
+        }
     }
 
     private void RegisterSlotTypes()

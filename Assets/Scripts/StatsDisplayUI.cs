@@ -36,28 +36,39 @@ public class StatsDisplayUI : MonoBehaviour
         // 2. Projdeme všechny existující staty z našeho Enumu
         foreach (StatType stat in Enum.GetValues(typeof(StatType)))
         {
+
             // Vytáhneme si hodnotu z našeho slovníku v PlayerStats
             float value = playerStats.GetStat(stat);
 
-            // VOLITELNÉ: Pokud chceš vypsat jen staty, které nejsou nulové
-            // (Zruš komentář u tohoto IFu, pokud nechceš ukazovat např. "Armor: 0")
-            // if (value == 0) continue; 
+            VisualElement row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.justifyContent = Justify.SpaceBetween; // Tohle roztáhne texty od sebe!
+            row.style.width = new Length(100, LengthUnit.Percent); // Řádek zabere celou šířku panelu
+            row.style.marginBottom = 5; // Malá mezera pod řádkem
 
-            // 3. Vytvoříme nový textový element (Label) přímo v kódu
-            Label statLabel = new Label();
+            
+            
 
-            // 4. Upravíme název. Regulární výraz "LifeSteal" rozdělí na "Life Steal"
+        
             string formatedName = Regex.Replace(stat.ToString(), "([a-z])([A-Z])", "$1 $2");
 
-            // 5. Poskládáme finální text (např. "Life Steal: 15")
-            statLabel.text = $"{formatedName}: {value}";
-            statLabel.style.color = Color.white;
+            
+            Label nameLabel = new Label();
+            nameLabel.text = formatedName;
+            nameLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
 
-            // Přidáme mu CSS třídu (volitelné), abys ho mohl v UI Builderu hromadně stylovat
-            statLabel.AddToClassList("stat-row-text");
+            
+            Label valueLabel = new Label();
+            valueLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+            valueLabel.text = value.ToString("0.##"); // Formátování na 2 desetinná místa
+            nameLabel.style.color = new StyleColor(Color.white);
+            valueLabel.style.color = new StyleColor(Color.white);
+            nameLabel.style.fontSize = 14;
+            valueLabel.style.fontSize = 14;
+            row.Add(nameLabel);
+            row.Add(valueLabel);
+            statsContainer.Add(row);
 
-            // 6. Vložíme tento nový řádek do našeho kontejneru v UI
-            statsContainer.Add(statLabel);
         }
     }
 }
