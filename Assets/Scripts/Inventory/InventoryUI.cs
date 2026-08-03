@@ -72,8 +72,28 @@ public class ItemDragManipulator : PointerManipulator
     {
         if (_dragging && target.HasPointerCapture(evt.pointerId))
             target.ReleasePointer(evt.pointerId);
-    }
 
+        //hover zůstane itemu dodkud se nespustí další hover
+  
+        Vector2 mousePosition = evt.position;
+        VisualElement dropContainer = _root.Q<VisualElement>("drop-container");
+        if (dropContainer.worldBound.Contains(mousePosition))
+        {
+            // Spadne to sem JEN KDYŽ jsi mimo obdélník inventáře
+            Debug.Log("Vyhazuji předmět z okna!");
+            _root.Query<VisualElement>(className: "slot-hover").ForEach(s => s.RemoveFromClassList("slot-hover"));
+            DropItemIntoWorld();
+        }
+    }
+    private void DropItemIntoWorld()
+    {
+        // 1. Zničit ikonku z UI (odstranit target ze slotu)
+        target.RemoveFromHierarchy();
+
+        // 2. Smazat item z dat inventáře v kódu
+
+        // 3. Zavolat Player skript nebo Game Managera, aby vytvořil "DroppedItem" na zemi
+    }
     private void OnPointerCaptureOut(PointerCaptureOutEvent evt)
     {
         // Vždy odstraň slot-hover a slot-dragging bez ohledu na _dragging flag
