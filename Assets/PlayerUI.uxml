@@ -29,9 +29,6 @@
                         <ui:Label text="Stats" style="-unity-text-outline-color: rgb(255, 255, 255); color: rgb(255, 255, 255); font-size: 36px;"/>
                         <ui:VisualElement name="stats-container" style="flex-grow: 1; width: 429px; align-self: flex-start; align-items: center; height: 480px;"/>
                     </ui:VisualElement>
-                    <ui:VisualElement name="drop-container" style="flex-grow: 0; background-image: none; background-color: rgba(0, 0, 0, 0.298); -unity-background-image-tint-color: rgba(255, 255, 255, 0.502); width: 480px; height: 470px; background-size: 100% 100%; -unity-background-scale-mode: stretch-to-fill; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; padding-left: 25px; margin-left: 20px; align-self: flex-start; align-content: center; align-items: center; justify-content: center; padding-top: 25px; padding-right: 25px; padding-bottom: 25px; margin-top: 10px;">
-                        <ui:Label text="DROP " style="color: rgba(53, 53, 53, 0.4); font-size: 40px;"/>
-                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

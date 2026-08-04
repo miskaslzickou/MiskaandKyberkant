@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 
 
@@ -12,18 +13,22 @@ public class ItemDragManipulator : PointerManipulator
     private Vector2 _startPosition;
     private Vector3 _pointerStartPosition;
     private bool _dragging;
-
+ 
     private readonly VisualElement _root;
     private readonly InventoryItem _item;
     private readonly InventoryUI _ui;
-
+    private readonly GameObject _droppedItemPrefab;
+    private bool isContextMenuOpen = false;
+    private VisualElement menu;
     public ItemDragManipulator(VisualElement target, VisualElement root,
-                               InventoryItem item, InventoryUI ui)
+                               InventoryItem item, InventoryUI ui, GameObject droppedItemPrefab)
     {
         this.target = target;
         _root = root;
         _item = item;
         _ui = ui;
+        _droppedItemPrefab = droppedItemPrefab;
+    
     }
 
     protected override void RegisterCallbacksOnTarget()
@@ -44,20 +49,39 @@ public class ItemDragManipulator : PointerManipulator
 
     private void OnPointerDown(PointerDownEvent evt)
     {
-        _sourceSlot = target.parent;
+        if (evt.button == 1) // pravé tlačítko
+        {
+            if (isContextMenuOpen)
+            {
+                _root.Remove(menu);
+                isContextMenuOpen = false;
+            }
+            else
+            {
+                _ui.HideTooltip();
+                ShowContextMenu(target, _item, evt.position);
+                isContextMenuOpen = true;
+            }
+            evt.StopPropagation();
+            return; // ← důležité, aby se nespustil drag
+        }
 
+        // Zavři menu při levém kliknutí
+        if (isContextMenuOpen)
+        {
+            _root.Remove(menu);
+            isContextMenuOpen = false;
+        }
+
+        _sourceSlot = target.parent;
         _sourceSlot?.RemoveFromClassList("slot-hover");
         _sourceSlot?.AddToClassList("slot-dragging");
 
-        // Read current translate as start position
         Translate current = target.resolvedStyle.translate;
         _startPosition = new Vector2(current.x.value, current.y.value);
         _pointerStartPosition = evt.position;
         target.CapturePointer(evt.pointerId);
         target.BringToFront();
-
-        // Odstranili jsme Position.Absolute, aby item neskákal mimo slot,
-        // a použijeme pouze čistou vizuální vrstvu (translate) pro tažení.
         _dragging = true;
     }
 
@@ -67,32 +91,69 @@ public class ItemDragManipulator : PointerManipulator
         Vector3 delta = evt.position - _pointerStartPosition;
         SetTranslate(target, new Vector2(_startPosition.x + delta.x, _startPosition.y + delta.y));
     }
+    private void ShowContextMenu(VisualElement itemElement, InventoryItem item, Vector2 position)
+    {
+        // Vytvoříme kontextové menu
+         menu = new VisualElement();
+        // Přidáme možnost "Drop Item"
+        menu.style.position = Position.Absolute;
+        menu.style.left = position.x;
+        menu.style.top = position.y + 20;
+        if (_item.category == ItemCategory.Item)
 
+        {
+            Button contextMenuButton1 = new Button(() => { UseItem(); _root.Remove(menu); }) { text = "Use Item" };
+            contextMenuButton1.AddToClassList("context-menu-button");
+            menu.Add(contextMenuButton1);
+            
+        }
+        Button  contextMenuButton2 = new Button(() => { DropItemIntoWorld(); _root.Remove(menu); }) { text = "Drop Item" };
+        contextMenuButton2.AddToClassList("context-menu-button");
+        menu.Add(contextMenuButton2);
+
+        // Zobrazíme menu na pozici kurzoru
+        _root.Add(menu);
+        
+    }
     private void OnPointerUp(PointerUpEvent evt)
     {
         if (_dragging && target.HasPointerCapture(evt.pointerId))
             target.ReleasePointer(evt.pointerId);
-
-        //hover zůstane itemu dodkud se nespustí další hover
-  
-        Vector2 mousePosition = evt.position;
-        VisualElement dropContainer = _root.Q<VisualElement>("drop-container");
-        if (dropContainer.worldBound.Contains(mousePosition))
+        
+    }
+    private void UseItem()
+    {
+        // Zde implementujte logiku pro použití předmětu
+        Debug.Log($"Používám předmět: {_item.itemName}");
+        // Například můžete snížit množství, spustit efekt, atd.
+        if (_item.quantity > 1)
         {
-            // Spadne to sem JEN KDYŽ jsi mimo obdélník inventáře
-            Debug.Log("Vyhazuji předmět z okna!");
-            _root.Query<VisualElement>(className: "slot-hover").ForEach(s => s.RemoveFromClassList("slot-hover"));
-            DropItemIntoWorld();
+            _item.quantity--;
+            _ui.UpdateItemQuantityUI(_item);
+        }
+        else
+        {
+            // Pokud je množství 1, odstraníme předmět z inventáře
+            _ui.RemoveItemFromSlot(_sourceSlot.name);
         }
     }
     private void DropItemIntoWorld()
     {
-        // 1. Zničit ikonku z UI (odstranit target ze slotu)
+        _ui.HideTooltip();
+        
         target.RemoveFromHierarchy();
 
-        // 2. Smazat item z dat inventáře v kódu
+        // 3. Spawn ve světě
+        GameObject player = GameObject.FindWithTag("Player");
+        Vector3 playerPos = player != null ? player.transform.position : Vector3.zero;
 
-        // 3. Zavolat Player skript nebo Game Managera, aby vytvořil "DroppedItem" na zemi
+        GameObject droppedObj = Object.Instantiate(_droppedItemPrefab, playerPos, Quaternion.identity);
+        DroppedItem droppedItem = droppedObj.GetComponent<DroppedItem>();
+        if (droppedItem != null)
+        {
+            droppedItem.InitializeItem(_item.icon);
+            droppedItem.item = _item;
+        }
     }
     private void OnPointerCaptureOut(PointerCaptureOutEvent evt)
     {
@@ -156,7 +217,9 @@ public class ItemDragManipulator : PointerManipulator
 
 // ── Main MonoBehaviour ────────────────────────────────────────────────────────
 public class InventoryUI : MonoBehaviour
+
 {
+    public GameObject droppedItemPrefab; // Reference to the prefab for the dropped item
     [Header("UI")]
     [SerializeField] private UIDocument uiDocument;
 
@@ -511,7 +574,7 @@ public class InventoryUI : MonoBehaviour
         if (item.icon != null)
             element.style.backgroundImage = new StyleBackground(item.icon);
 
-        element.AddManipulator(new ItemDragManipulator(element, _root, item, this));
+        element.AddManipulator(new ItemDragManipulator(element, _root, item, this, droppedItemPrefab));
 
         // Label pro zobrazení množství (quantity), přidán do pravého dolního rohu itemu
         Label qtyLabel = new Label();
