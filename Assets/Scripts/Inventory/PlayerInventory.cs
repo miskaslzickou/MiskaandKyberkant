@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 public class PlayerInventory : MonoBehaviour
 {
     public UIDocument uiDocument;
-    public ItemData inventoryItem; // Tady v Inspectoru přetáhneš tvůj ScriptableObject
+
     [SerializeField] private InventoryUI inventoryUI;
 
     private PlayerAction playerActions;
@@ -34,8 +34,7 @@ public class PlayerInventory : MonoBehaviour
 
     void Start()
     {
-        InventoryItem novyItem = new InventoryItem(inventoryItem);
-        inventoryUI.AddItemToContainer(novyItem);
+        
     }
 
     private void OnEnable()

@@ -9,6 +9,7 @@ public class Cheats : MonoBehaviour
     [Header("Itemy k naklikání (Scriptable Objects)")]
     public ItemData cheatWeapon;
     public ItemData cheatArmor;
+    public ItemData cheatConsumable;
     
 
     void Update()
@@ -28,6 +29,10 @@ public class Cheats : MonoBehaviour
         if (Keyboard.current.f2Key.wasPressedThisFrame)
         {
             GiveCheatItem(cheatArmor);
+        }
+        if(Keyboard.current.f3Key.wasPressedThisFrame)
+        {
+            GiveCheatItem(cheatConsumable);
         }
     }
 

@@ -57,7 +57,19 @@ public class StatsDisplayUI : MonoBehaviour
             nameLabel.text = formatedName;
             nameLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
 
-            
+            VisualElement icon= new VisualElement();
+            icon.style.width = 36;
+            icon.style.height = 36;
+            icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Cover);
+            string path = $"Sprites/Inventory/stat-icon-{formatedName.ToLower().Replace(" ", "-")}";
+           
+            Texture2D loadedTex = Resources.Load<Texture2D>(path);
+
+            if (loadedTex != null)
+            {
+                icon.style.backgroundImage = new StyleBackground(loadedTex);
+            }
+
             Label valueLabel = new Label();
             valueLabel.style.unityTextAlign = TextAnchor.MiddleRight;
             valueLabel.text = value.ToString("0.##"); // Formátování na 2 desetinná místa
@@ -65,7 +77,11 @@ public class StatsDisplayUI : MonoBehaviour
             valueLabel.style.color = new StyleColor(Color.white);
             nameLabel.style.fontSize = 14;
             valueLabel.style.fontSize = 14;
-            row.Add(nameLabel);
+            VisualElement pair= new VisualElement();
+            pair.style.flexDirection = FlexDirection.Row;
+            pair.Add(icon);
+            pair.Add(nameLabel);
+            row.Add(pair);
             row.Add(valueLabel);
             statsContainer.Add(row);
 
