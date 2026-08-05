@@ -49,6 +49,7 @@ public class ItemDragManipulator : PointerManipulator
 
     private void OnPointerDown(PointerDownEvent evt)
     {
+        _sourceSlot = target.parent;
         if (evt.button == 1) // pravé tlačítko
         {
             if (isContextMenuOpen)
@@ -136,12 +137,16 @@ public class ItemDragManipulator : PointerManipulator
             // Pokud je množství 1, odstraníme předmět z inventáře
             _ui.RemoveItemFromSlot(_sourceSlot.name);
         }
+        isContextMenuOpen = false;
     }
     private void DropItemIntoWorld()
     {
         _ui.HideTooltip();
-        
-        target.RemoveFromHierarchy();
+
+        if (_sourceSlot != null)
+            _ui.RemoveItemFromSlot(_sourceSlot.name);
+        else
+            target.RemoveFromHierarchy(); // fallback
 
         // 3. Spawn ve světě
         GameObject player = GameObject.FindWithTag("Player");
@@ -154,6 +159,7 @@ public class ItemDragManipulator : PointerManipulator
             droppedItem.InitializeItem(_item.icon);
             droppedItem.item = _item;
         }
+        isContextMenuOpen = false;
     }
     private void OnPointerCaptureOut(PointerCaptureOutEvent evt)
     {
@@ -591,8 +597,9 @@ public class InventoryUI : MonoBehaviour
         // Přidáme jemný stín (Outline) aby bylo číslo dobře vidět i na světlém pozadí ikonek
         qtyLabel.style.textShadow = new TextShadow { color = Color.black, offset = new Vector2(1, 1), blurRadius = 3 };
         qtyLabel.text =  item.quantity.ToString() ;
+        qtyLabel.style.display = item.quantity > 1 ? DisplayStyle.Flex : DisplayStyle.None;
 
-        if(item.category == ItemCategory.Item)
+        if (item.category == ItemCategory.Item)
         element.Add(qtyLabel);
 
         string itemStats = "";
@@ -617,11 +624,18 @@ public class InventoryUI : MonoBehaviour
             Label qtyLabel = element.Q<Label>("qty-label");
             if (qtyLabel != null)
             {
-                // Pokud je víc jak 1 položka, ukážeme číslo, jinak ho schováme, ať nestraší jednička všude po inventáři
-                qtyLabel.text = item.quantity > 1 ? item.quantity.ToString() : "";
+                if (item.quantity > 1)
+                {
+                    qtyLabel.text = item.quantity.ToString();
+                    qtyLabel.style.display = DisplayStyle.Flex;
+                }
+                else
+                {
+                    qtyLabel.style.display = DisplayStyle.None;
+                }
             }
         }
-    } 
+    }
 
     //pozdeji barva na zakladě rarity, ted jsem nechal old kod
     private static Color CategoryColor(ItemCategory cat) => cat switch
