@@ -434,7 +434,7 @@ public class InventoryUI : MonoBehaviour
     /// <summary>
     /// Add item to items-container (unequipped inventory) without placing it in a slot.
     /// </summary>
-    public void AddItemToContainer(InventoryItem item)
+    public bool AddItemToContainer(InventoryItem item)
     {
         // Najdeme první prázdný obyčejný slot a vložíme předmět přímo do něj, místo volně do kontejneru
         foreach (VisualElement slot in _root.Query<VisualElement>(className: "inv-slot-item").ToList())
@@ -442,11 +442,12 @@ public class InventoryUI : MonoBehaviour
             if (!IsSlotOccupied(slot.name))
             {
                 InsertItem(item, slot.name);
-                return;
+                return true;
             }
         }
 
         Debug.LogWarning($"[Inventory] Nemohu přidat '{item.itemName}', kontejner je buď plný nebo nemá sloty.");
+        return false;
     }
 
     // =========================================================================

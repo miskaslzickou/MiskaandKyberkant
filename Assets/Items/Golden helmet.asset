@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Golden helmet
   description: 
   category: 0
-  icon: {fileID: -9097067248546533923, guid: de6ba9c9e7ded914f84f0f0a5262458d, type: 3}
+  icon: {fileID: 21300000, guid: de6ba9c9e7ded914f84f0f0a5262458d, type: 3}
   stats:
   - statType: 5
     value: 100
