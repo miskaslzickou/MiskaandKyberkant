@@ -194,7 +194,6 @@ public class ItemDragManipulator : PointerManipulator
         SlotType.Chest => item == ItemCategory.Chest,
         SlotType.Boots => item == ItemCategory.Boots,
         SlotType.Ring => item == ItemCategory.Ring,
-        SlotType.Weapon => item == ItemCategory.Weapon,
         SlotType.ItemSlot => true,
         _ => false
     };
@@ -539,7 +538,7 @@ public class InventoryUI : MonoBehaviour
         SetSlotType("slot-chest", SlotType.Chest);
         SetSlotType("slot-boots", SlotType.Boots);
         SetSlotType("slot-ring", SlotType.Ring);
-        SetSlotType("slot-weapon", SlotType.Weapon);
+        
 
         int slotIndex = 0;
         foreach (VisualElement s in _root.Query<VisualElement>(className: "inv-slot-item").ToList())

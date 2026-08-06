@@ -7,6 +7,7 @@ public class PlayerInventory : MonoBehaviour
     public UIDocument uiDocument;
 
     [SerializeField] private InventoryUI inventoryUI;
+    public WeaponManager weaponManager;
 
     private PlayerAction playerActions;
     private VisualElement root;
@@ -17,6 +18,7 @@ public class PlayerInventory : MonoBehaviour
         playerActions = new PlayerAction();
         root = uiDocument.rootVisualElement;
         inventoryPanel = root.Q<VisualElement>("InventoryPanel");
+        inventoryUI.OnItemRemoved += OnItemRemoved;
 
         if (inventoryPanel != null)
         {
@@ -52,18 +54,51 @@ public class PlayerInventory : MonoBehaviour
         };
 
     }
+    private void OnItemRemoved(InventoryItem item, string slotName)
+    {
+        if (weaponManager.CurrentWeapon == item)
+            weaponManager.CurrentWeapon = null;
+    }
+
+    private void OnDestroy()
+    {
+        inventoryUI.OnItemRemoved -= OnItemRemoved;
+
+    }
 
     void HotbarPerformed(int slotNum)
     {
-      InventoryItem  hotbarItem =inventoryUI.GetItemInSlot("inv-slot-item-"+slotNum);
-        if(hotbarItem != null &&hotbarItem.category == ItemCategory.Item) {
-            inventoryUI.UseItem(hotbarItem, "inv-slot-item-"+slotNum);
+        InventoryItem hotbarItem = inventoryUI.GetItemInSlot("inv-slot-item-" + slotNum);
+
+        // Kliknutí na prázdný slot - neřešíme (nebo můžeš chtít unequip, ale obvykle ne)
+        if (hotbarItem == null)
+        {
+            weaponManager.CurrentWeapon = null;
+        }
+
+        //  Pokud je to obyčejný item (lektvar atd.)
+        if (hotbarItem.category == ItemCategory.Item)
+        {
+            inventoryUI.UseItem(hotbarItem, "inv-slot-item-" + slotNum);
+            return; // Ukončíme, dál už nic neřešíme
+        }
+
+        // Pokud je to zbraň
+        if (hotbarItem.category == ItemCategory.Weapon)
+        {
+            // Pokud už tuhle konkrétní zbraň držíme v ruce, tak ji unequipneme (schováme)
+            if (weaponManager.CurrentWeapon == hotbarItem)
+            {
+                weaponManager.CurrentWeapon = null;
+            }
+            else
+            {
+                // Jinak ji normálně equipneme
+                weaponManager.CurrentWeapon = hotbarItem;
+            }
         }
     }
-    void Start()
-    {
-        
-    }
+
 
     private void OnEnable()
     {
