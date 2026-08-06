@@ -19,3 +19,4 @@ MonoBehaviour:
   stats:
   - statType: 0
     value: 500
+  rarity: 4

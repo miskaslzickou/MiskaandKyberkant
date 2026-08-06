@@ -57,7 +57,11 @@ public class PlayerInventory : MonoBehaviour
     private void OnItemRemoved(InventoryItem item, string slotName)
     {
         if (weaponManager.CurrentWeapon == item)
+        {
             weaponManager.CurrentWeapon = null;
+            inventoryUI.SetActiveHotbarSlot(-1); // Reset the active hotbar slot when the item is removed
+        }
+          
     }
 
     private void OnDestroy()
@@ -74,6 +78,8 @@ public class PlayerInventory : MonoBehaviour
         if (hotbarItem == null)
         {
             weaponManager.CurrentWeapon = null;
+            inventoryUI.SetActiveHotbarSlot(-1);
+            return;
         }
 
         //  Pokud je to obyčejný item (lektvar atd.)
@@ -90,11 +96,13 @@ public class PlayerInventory : MonoBehaviour
             if (weaponManager.CurrentWeapon == hotbarItem)
             {
                 weaponManager.CurrentWeapon = null;
+                inventoryUI.SetActiveHotbarSlot(-1); // Reset the active hotbar slot when the weapon is unequipped
             }
             else
             {
                 // Jinak ji normálně equipneme
                 weaponManager.CurrentWeapon = hotbarItem;
+                inventoryUI.SetActiveHotbarSlot(slotNum); // Nastavíme aktivní slot na UI
             }
         }
     }

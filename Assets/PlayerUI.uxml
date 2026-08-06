@@ -3,11 +3,21 @@
     <ui:VisualElement name="Inventory" style="flex-grow: 1; cursor: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=-6527069497977903076&amp;guid=a6ce1382f4cdb934b9851f36f022b582&amp;type=3#check-dash&quot;);">
         <ui:VisualElement name="inventory-root" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
             <ui:VisualElement name="items-container" style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.502);"/>
-                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;"/>
-                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;"/>
-                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;"/>
-                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;"/>
+                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;">
+                    <ui:Label text="1" style="position: absolute; top: initial; bottom: -3px; color: rgb(83, 83, 83); font-size: 12px; left: 1px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;">
+                    <ui:Label text="2" style="position: absolute; top: initial; bottom: -3px; color: rgb(83, 83, 83); font-size: 12px; left: 1px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;">
+                    <ui:Label text="3" style="position: absolute; top: initial; bottom: -3px; color: rgb(83, 83, 83); font-size: 12px; left: 1px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;">
+                    <ui:Label text="4" style="position: absolute; top: initial; bottom: -3px; color: rgb(83, 83, 83); font-size: 12px; left: 1px;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="inv-slot-item" style="flex-grow: 1;">
+                    <ui:Label text="5" style="position: absolute; top: initial; bottom: -3px; color: rgb(83, 83, 83); font-size: 12px; left: 1px;"/>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="InventoryPanel" style="flex-grow: 1; flex-direction: row; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="VisualElement" style="flex-grow: 0; background-image: resource(&quot;Sprites/Inventory/silloute&quot;); background-color: rgba(0, 0, 0, 0.749); -unity-background-image-tint-color: rgba(255, 255, 255, 0.502); width: 480px; height: 960px; background-size: 100% 100%; -unity-background-scale-mode: stretch-to-fill; border-top-left-radius: 15px; border-bottom-left-radius: 15px; margin-left: 50px;"/>

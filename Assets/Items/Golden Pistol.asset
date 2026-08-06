@@ -15,9 +15,10 @@ MonoBehaviour:
   itemName: Golden Revolver
   description: 'Used by a now dead sheriff '
   category: 4
-  icon: {fileID: 21300000, guid: 29f10017a0487e0479ea94dd80d454ec, type: 3}
+  icon: {fileID: 21300000, guid: 66631855d5737f24db86356af5433d6e, type: 3}
   stats:
   - statType: 1
     value: 100
   - statType: 4
     value: 0.5
+  rarity: 3

@@ -212,8 +212,8 @@ public class InventoryUI : MonoBehaviour
     public GameObject droppedItemPrefab; // Reference to the prefab for the dropped item
     [Header("UI")]
     [SerializeField] private UIDocument uiDocument;
+    private int _activeHotbarSlot = -1;
 
-    
 
     // slotName → item currently in that slot
     private readonly Dictionary<string, InventoryItem> _slotContents = new();
@@ -531,7 +531,24 @@ public class InventoryUI : MonoBehaviour
             }
         }
     }
+    public void SetActiveHotbarSlot(int slotIndex)
+    {
+        // Odeber ze starého
+        if (_activeHotbarSlot >= 0)
+        {
+            VisualElement oldSlot = _root.Q<VisualElement>($"inv-slot-item-{_activeHotbarSlot}");
+            oldSlot?.RemoveFromClassList("slot-active");
+        }
 
+        _activeHotbarSlot = slotIndex;
+
+        // Přidej na nový
+        if (slotIndex >= 0)
+        {
+            VisualElement newSlot = _root.Q<VisualElement>($"inv-slot-item-{slotIndex}");
+            newSlot?.AddToClassList("slot-active");
+        }
+    }
     private void RegisterSlotTypes()
     {
         SetSlotType("slot-hat", SlotType.Hat);

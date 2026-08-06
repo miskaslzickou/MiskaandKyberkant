@@ -15,7 +15,8 @@ MonoBehaviour:
   itemName: Golden boots
   description: 
   category: 2
-  icon: {fileID: 21300000, guid: 927ddad869b6b7b4587587edc3e754ec, type: 3}
+  icon: {fileID: 21300000, guid: 0a1361ffcab2bfb47b69397cbc188118, type: 3}
   stats:
   - statType: 2
-    value: 15
+    value: 5
+  rarity: 2
