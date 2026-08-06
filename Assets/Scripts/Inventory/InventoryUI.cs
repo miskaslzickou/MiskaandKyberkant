@@ -103,7 +103,7 @@ public class ItemDragManipulator : PointerManipulator
         if (_item.category == ItemCategory.Item)
 
         {
-            Button contextMenuButton1 = new Button(() => { UseItem(); _root.Remove(menu); }) { text = "Use Item" };
+            Button contextMenuButton1 = new Button(() => { _ui.UseItem(_item, _sourceSlot.name); _root.Remove(menu); }) { text = "Use Item" };
             contextMenuButton1.AddToClassList("context-menu-button");
             menu.Add(contextMenuButton1);
             
@@ -122,23 +122,7 @@ public class ItemDragManipulator : PointerManipulator
             target.ReleasePointer(evt.pointerId);
         
     }
-    private void UseItem()
-    {
-        // Zde implementujte logiku pro použití předmětu
-        Debug.Log($"Používám předmět: {_item.itemName}");
-        // Například můžete snížit množství, spustit efekt, atd.
-        if (_item.quantity > 1)
-        {
-            _item.quantity--;
-            _ui.UpdateItemQuantityUI(_item);
-        }
-        else
-        {
-            // Pokud je množství 1, odstraníme předmět z inventáře
-            _ui.RemoveItemFromSlot(_sourceSlot.name);
-        }
-        isContextMenuOpen = false;
-    }
+
     private void DropItemIntoWorld()
     {
         _ui.HideTooltip();
@@ -329,6 +313,9 @@ public class InventoryUI : MonoBehaviour
 
         // Spawn the element inside the slot
         VisualElement element = CreateItemElement(item);
+       
+
+
         slot.Add(element);
 
         // Skrytí původní siluety / ikony pozadí
@@ -347,6 +334,23 @@ public class InventoryUI : MonoBehaviour
     /// Remove the item currently in a specific slot.
     /// Returns the removed item, or null if the slot was empty.
     /// </summary>
+    /// 
+    public void UseItem(InventoryItem item, string sourceSlotName)
+    {
+        Debug.Log($"Používám předmět: {item.itemName}");
+
+        item.quantity--;
+
+        if (item.quantity <= 0)
+        {
+            RemoveItemFromSlot(sourceSlotName);
+        }
+        else
+        {
+            UpdateItemQuantityUI(item);
+        }
+    }
+
     public InventoryItem RemoveItemFromSlot(string slotName)
     {
         if (!_slotContents.TryGetValue(slotName, out InventoryItem item))
@@ -573,12 +577,42 @@ public class InventoryUI : MonoBehaviour
         });
         slot.RegisterCallback<PointerLeaveEvent>(_ => slot.RemoveFromClassList("slot-hover"));
     }
-
+    private Texture2D CreateGradientTexture(Color color)
+    {
+        Texture2D tex = new Texture2D(64, 1);
+        for (int i = 0; i < 64; i++)
+        {
+            float t = i / 63f;
+            // průhledná → plná → průhledná
+            float alpha = Mathf.Sin(t * Mathf.PI);
+            tex.SetPixel(i, 0, new Color(color.r, color.g, color.b, alpha));
+        }
+        tex.Apply();
+        tex.filterMode = FilterMode.Point; // Zabrání rozmazání pixelů
+        tex.wrapMode = TextureWrapMode.Clamp; // Zabrání opakovacímu přetékání na okrajích
+        return tex;
+    }
     private VisualElement CreateItemElement(InventoryItem item)
     {
         var element = new VisualElement();
         element.name = $"item-{item.instanceId}";
         element.AddToClassList("inv-item");
+
+        
+      
+        var gradientBar = new VisualElement();
+        gradientBar.style.position = Position.Absolute;
+        gradientBar.style.bottom = -8;
+        gradientBar.style.left = 0;
+        gradientBar.style.right = 0;
+        gradientBar.style.height = 5;
+        gradientBar.style.width = 64;
+        gradientBar.style.left = Length.Percent(50);
+        gradientBar.style.translate = new Translate(Length.Percent(-50), 0);
+        gradientBar.style.backgroundImage = new StyleBackground(CreateGradientTexture( RarityColor(item.rarity)));
+
+        element.Add(gradientBar);
+
 
         if (item.icon != null)
             element.style.backgroundImage = new StyleBackground(item.icon);
@@ -641,14 +675,14 @@ public class InventoryUI : MonoBehaviour
     }
 
     //pozdeji barva na zakladě rarity, ted jsem nechal old kod
-    private static Color CategoryColor(ItemCategory cat) => cat switch
+    private static Color RarityColor(Rarity rarity) => rarity switch
     {
-        ItemCategory.Hat => Color.yellow,
-        ItemCategory.Chest => Color.blue,
-        ItemCategory.Boots => Color.green,
-        ItemCategory.Ring => Color.magenta,
-        ItemCategory.Weapon => Color.red,
-        ItemCategory.Item => Color.white,
+        Rarity.Common => Color.white,
+        Rarity.Uncommon => Color.green,
+        Rarity.Rare => Color.blue,
+        Rarity.Epic => new Color(0.5f, 0f, 0.5f),      // purple
+        Rarity.Legendary => new Color(1f, 0.84f, 0f),   // gold
         _ => Color.gray
     };
+
 }

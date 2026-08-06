@@ -30,8 +30,36 @@ public class PlayerInventory : MonoBehaviour
                 inventoryPanel.style.display = inventoryPanel.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
             }
         };
+        playerActions.Player.HotbarSlot1.performed += ctx =>
+        {
+            HotbarPerformed(0);
+        };
+        playerActions.Player.HotbarSlot2.performed += ctx =>
+        {
+            HotbarPerformed(1);
+        };
+        playerActions.Player.HotbarSlot3.performed += ctx =>
+        {
+            HotbarPerformed(2);
+        };
+        playerActions.Player.HotbarSlot4.performed += ctx =>
+        {
+            HotbarPerformed(3);
+        };
+        playerActions.Player.HotbarSlot5.performed += ctx =>
+        {
+            HotbarPerformed(4);
+        };
+
     }
 
+    void HotbarPerformed(int slotNum)
+    {
+      InventoryItem  hotbarItem =inventoryUI.GetItemInSlot("inv-slot-item-"+slotNum);
+        if(hotbarItem != null &&hotbarItem.category == ItemCategory.Item) {
+            inventoryUI.UseItem(hotbarItem, "inv-slot-item-"+slotNum);
+        }
+    }
     void Start()
     {
         

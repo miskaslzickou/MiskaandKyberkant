@@ -982,7 +982,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
   uiDocument: {fileID: 1961916003}
-  inventoryItem: {fileID: 11400000, guid: 7461fa92ff2720c4b9a50f0ba1b17d05, type: 2}
   inventoryUI: {fileID: 2051625580}
 --- !u!114 &2051625583
 MonoBehaviour:
@@ -997,8 +996,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Cheats
   inventoryUI: {fileID: 2051625580}
-  cheatWeapon: {fileID: 11400000, guid: b678fcd69d2323949a0efbacb4d6172e, type: 2}
-  cheatArmor: {fileID: 11400000, guid: 2ae3608985e86b547b3cf666b7a2ecbb, type: 2}
+  cheatWeapon: {fileID: 11400000, guid: bb746225cefe1814799095bfbba5f4fd, type: 2}
+  cheatArmor: {fileID: 11400000, guid: 7461fa92ff2720c4b9a50f0ba1b17d05, type: 2}
+  cheatConsumable: {fileID: 11400000, guid: 2ae3608985e86b547b3cf666b7a2ecbb, type: 2}
 --- !u!58 &2051625584
 CircleCollider2D:
   m_ObjectHideFlags: 0

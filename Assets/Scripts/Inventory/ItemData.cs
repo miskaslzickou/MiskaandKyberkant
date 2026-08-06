@@ -13,6 +13,6 @@ public class ItemData : ScriptableObject
     public ItemCategory category;
     public Sprite icon;
     public List<StatBonus> stats = new List<StatBonus>();
-
+    public Rarity rarity;
 
 }

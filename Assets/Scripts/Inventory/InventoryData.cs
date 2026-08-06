@@ -5,6 +5,7 @@ using UnityEngine;
 public enum ItemCategory { Hat, Chest, Boots, Ring, Weapon, Item }
 public enum SlotType { Hat, Chest, Boots, Ring, ItemSlot,Weapon }
 public enum StatType { Health, Damage, Speed, LifeSteal, AttackSpeed, Armor, Penetration, CriticalChance }
+public enum Rarity { Common, Uncommon, Rare, Epic, Legendary }
 
 [System.Serializable]
 public class StatBonus
@@ -26,6 +27,8 @@ public class InventoryItem
     // Proměnná držící statistiky
     public List<StatBonus> stats=new List<StatBonus>();
 
+    public Rarity rarity;
+
     // Unikátní ID pro každou instanci (např. kvůli duplicitám ve stejném inventáři)
     [System.NonSerialized]
     public string instanceId;
@@ -40,7 +43,7 @@ public class InventoryItem
 
         // Generujeme si unikátní ID pro toto konkrétní jablko, aby se nemíchalo s dalším jablkem.
         this.instanceId = $"{this.itemName}_{System.Guid.NewGuid()}";
-
+        this.rarity = sourceData.rarity;
         // Tady si ten item sám zkopíruje statistiky!
         this.stats = new List<StatBonus>();
         if (sourceData.stats != null)
