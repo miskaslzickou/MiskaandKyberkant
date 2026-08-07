@@ -28,9 +28,8 @@ public class GunWeapon : WeaponBehaviour
     public override void WhileEquipped()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        Vector2 direction = (mousePosition - (Vector2)player.transform.position).normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        weapon.transform.rotation = Quaternion.Euler(0, 0, angle);
+        Vector2 direction = (mousePosition - (Vector2)weapon.transform.position).normalized;
+        
     }
     private void OnDestroy()
     {
