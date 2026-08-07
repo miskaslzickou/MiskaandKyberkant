@@ -29,7 +29,7 @@ public class GunWeapon : WeaponBehaviour
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Vector2 direction = (mousePosition - (Vector2)weapon.transform.position).normalized;
-        
+         
     }
     private void OnDestroy()
     {

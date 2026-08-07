@@ -22,3 +22,4 @@ MonoBehaviour:
   - statType: 4
     value: 0.5
   rarity: 3
+  weaponPrefab: {fileID: 5691079156043184613, guid: d65d349ad5d3b5646a574049ef6a8e10, type: 3}
