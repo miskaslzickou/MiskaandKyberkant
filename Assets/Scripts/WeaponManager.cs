@@ -3,10 +3,11 @@ using UnityEngine;
 
 public class WeaponManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public event Action<InventoryItem> OnActiveWeaponChanged;
-    private InventoryItem _currWeapon;   
+    private InventoryItem _currWeapon;
     private SpriteRenderer spriteRenderer;
+    private GameObject _currentWeaponInstance; // ← nový field
+
     public InventoryItem CurrentWeapon
     {
         get => _currWeapon;
@@ -16,24 +17,29 @@ public class WeaponManager : MonoBehaviour
             {
                 _currWeapon = value;
                 OnActiveWeaponChanged?.Invoke(_currWeapon);
-                EquipWeapon();
+                EquipWeapon(); // ← volá se stále stejně
             }
         }
     }
 
     private void EquipWeapon()
     {
-       spriteRenderer.sprite = CurrentWeapon != null ? CurrentWeapon.icon : null;
+        if (_currentWeaponInstance != null)
+            Destroy(_currentWeaponInstance);
+
+        if (CurrentWeapon?.weaponPrefab != null)
+        {
+            _currentWeaponInstance = Instantiate(CurrentWeapon.weaponPrefab, transform);
+            var behaviour = _currentWeaponInstance.GetComponent<WeaponBehaviour>();
+            behaviour?.Initialize(CurrentWeapon);
+            behaviour?.OnEquip();
+        }
+
+        spriteRenderer.sprite = CurrentWeapon?.icon;
     }
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

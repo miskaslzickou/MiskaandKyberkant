@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 // Zde musí být i definice enumů, pokud jsi je smazal z InventoryUI
@@ -28,6 +29,7 @@ public class InventoryItem
     public List<StatBonus> stats=new List<StatBonus>();
 
     public Rarity rarity;
+    public GameObject weaponPrefab;
 
     // Unikátní ID pro každou instanci (např. kvůli duplicitám ve stejném inventáři)
     [System.NonSerialized]
@@ -44,6 +46,7 @@ public class InventoryItem
         // Generujeme si unikátní ID pro toto konkrétní jablko, aby se nemíchalo s dalším jablkem.
         this.instanceId = $"{this.itemName}_{System.Guid.NewGuid()}";
         this.rarity = sourceData.rarity;
+        this.weaponPrefab = sourceData.weaponPrefab;
         // Tady si ten item sám zkopíruje statistiky!
         this.stats = new List<StatBonus>();
         if (sourceData.stats != null)
@@ -54,5 +57,11 @@ public class InventoryItem
             }
         }
     }
+    public float GetStat(StatType statType)
+    {
+        StatBonus bonus = stats.Find(s => s.statType == statType);
+        return bonus != null ? bonus.value : 0f;
+    }
+
 }
 

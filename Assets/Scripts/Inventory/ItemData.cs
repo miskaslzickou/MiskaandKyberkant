@@ -14,5 +14,5 @@ public class ItemData : ScriptableObject
     public Sprite icon;
     public List<StatBonus> stats = new List<StatBonus>();
     public Rarity rarity;
-
+    public GameObject weaponPrefab;
 }
